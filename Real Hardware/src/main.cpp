@@ -1,25 +1,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-
-
 #include "DHT.h"
-
-
-
 
 #define DHTPIN 27    
 #define DHTTYPE DHT22  
 
-
-
-
 DHT dht(DHTPIN, DHTTYPE);
-
-
-
-
-
 
 // Ganti dengan kredensial WiFi Anda
 const char* ssid = "Redmi10C";
@@ -42,13 +29,6 @@ void setup() {
   }
   Serial.println(" Terhubung!");
 
-
-
-
-
-
-
-
   dht.begin();
  
   // Tunggu sebentar agar koneksi stabil
@@ -64,46 +44,30 @@ void loop() {
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
-
-
-
-
-
     float h = round(dht.readHumidity());
     // Read temperature as Celsius (the default)
     float t = round(dht.readTemperature());
  
- 
+
     // Check if any reads failed and exit early (to try again).
     if (isnan(h) || isnan(t)) {
       Serial.println(F("Failed to read from DHT sensor!"));
       return;
     }
  
-
-
     // Compute heat index in Celsius (isFahreheit = false)
     float hic = dht.computeHeatIndex(t, h, false);
 
-
-
-
     // Inisialisasi HTTPClient
     HTTPClient http;
-    String url = "http://92c1-2a09-bac5-3a19-1028-00-19c-4d.ngrok-free.app/api/posts"; // Ganti dengan URL ngrok yang benar
-
+    String url = "http://c917-2a09-bac5-3a1b-25af-00-3c1-4c.ngrok-free.app/api/posts"; // Ganti dengan URL ngrok yang benar
 
     http.begin(url);  // Menggunakan HTTP, bukan HTTPS
     http.addHeader("Content-Type", "application/json");
 
-
-
-
 String payload = "{\"nama_sensor\":\"Sensor GD\", \"nilai1\":" + String(h) + ", \"nilai2\":" + String(t) + "}";
 
-
 Serial.println(payload);  // Untuk melihat apakah payload sudah terbentuk dengan benar
-
 
     // Kirim POST request
     int httpResponseCode = http.POST(payload);
@@ -111,7 +75,6 @@ Serial.println(payload);  // Untuk melihat apakah payload sudah terbentuk dengan
     // Tampilkan kode respons HTTP
     Serial.print("Kode respons HTTP: ");
     Serial.println(httpResponseCode);
-
 
     // Tampilkan respons dari server jika request berhasil
     if (httpResponseCode == 200 || httpResponseCode == 201) {
@@ -121,7 +84,6 @@ Serial.println(payload);  // Untuk melihat apakah payload sudah terbentuk dengan
     } else {
       Serial.println("Gagal mengirim data");
     }
-
 
     // Tutup koneksi HTTP
     http.end();
